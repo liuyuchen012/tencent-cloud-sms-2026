@@ -1,13 +1,13 @@
 <?php
 /**
  * Plugin Name: 腾讯云短信验证码
- * Plugin URI: https://yourwebsite.com/tencent-cloud-sms
+ * Plugin URI: https://github.com/liuyuchen012/tencent-cloud-sms-2026?tab=readme-ov-file
  * Description: 集成腾讯云短信服务，支持验证码发送、验证和登录安全增强。适用于最新版WordPress。
  * Version: 1.0.0
  * Author: Your Name
- * Author URI: https://yourwebsite.com
- * License: GPL v2 or later
- * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Author URI: https://github.com/liuyuchen012/
+ * License: gpl-3.0
+ * License URI: https://gnu.ac.cn/licenses/gpl-3.0.html
  * Text Domain: tencent-cloud-sms
  * Domain Path: /languages
  * Requires at least: 5.8
