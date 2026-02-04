@@ -3,7 +3,7 @@
         'name' => 'liuyuchen012/tencent-cloud-sms-2026',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '00142a201b298c1defa97b377f1bddc4d6728ef9',
+        'reference' => '63385a8f65027d6a7c65a2de832c6aff2e6dc58f',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -40,7 +40,7 @@
         'liuyuchen012/tencent-cloud-sms-2026' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '00142a201b298c1defa97b377f1bddc4d6728ef9',
+            'reference' => '63385a8f65027d6a7c65a2de832c6aff2e6dc58f',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
