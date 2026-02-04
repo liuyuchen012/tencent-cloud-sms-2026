@@ -4,7 +4,7 @@
  * Plugin URI: https://github.com/liuyuchen012/tencent-cloud-sms-2026?tab=readme-ov-file
  * Description: 集成腾讯云短信服务，支持验证码发送、验证和登录安全增强。适用于最新版WordPress。
  * Version: 1.0.0
- * Author: Your Name
+ * Author: 刘宇晨 | Liu Yuchen
  * Author URI: https://github.com/liuyuchen012/
  * License: gpl-3.0
  * License URI: https://gnu.ac.cn/licenses/gpl-3.0.html
@@ -20,6 +20,13 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+
+// ==================== 关键修复：防止重复加载 ====================
+// 如果插件已经加载过，直接退出
+if (defined('TCSMS_PLUGIN_FILE')) {
+    return; // 不执行任何代码，直接退出
+}
+// ===============================================================
 
 // 定义插件常量
 define('TCSMS_VERSION', '1.0.0');
@@ -47,149 +54,179 @@ add_action('plugins_loaded', function() {
         // 加载Composer自动加载器
         require_once $composer_autoload;
     }
-    
-    // 自动加载插件类
-    spl_autoload_register('tcsms_autoloader');
-    
-    // 注册激活和停用钩子（必须在这里注册，确保类已加载）
-    register_activation_hook(__FILE__, ['TCSMS_Core', 'activate']);
-    register_deactivation_hook(__FILE__, ['TCSMS_Core', 'deactivate']);
 }, 5);
 
-/**
- * 类自动加载器
- * 支持：TCSMS_Core, TCSMS_Settings, TCSMS_API, TCSMS_DB
- */
-function tcsms_autoloader($class_name) {
-    // 只加载TCSMS_开头的类
-    if (strpos($class_name, 'TCSMS_') === 0) {
-        $class_file = str_replace('_', '-', strtolower(substr($class_name, 6)));
-        $file_path = TCSMS_PLUGIN_DIR . 'includes/class-' . $class_file . '.php';
+// 类自动加载器
+if (!function_exists('tcsms_autoloader')) {
+    /**
+     * 类自动加载器
+     * 支持：TCSMS_Core, TCSMS_Settings, TCSMS_API, TCSMS_DB
+     */
+    function tcsms_autoloader($class_name) {
+        // 只加载TCSMS_开头的类
+        if (strpos($class_name, 'TCSMS_') === 0) {
+            $class_file = str_replace('_', '-', strtolower(substr($class_name, 6)));
+            $file_path = TCSMS_PLUGIN_DIR . 'includes/class-' . $class_file . '.php';
+            
+            if (file_exists($file_path)) {
+                require_once $file_path;
+            } else {
+                // 调试信息
+                error_log('腾讯云短信插件：未找到类文件: ' . $file_path);
+            }
+        }
+    }
+    
+    // 注册自动加载器
+    spl_autoload_register('tcsms_autoloader');
+}
+
+// 获取插件实例函数
+if (!function_exists('tcsms')) {
+    /**
+     * 获取插件实例
+     * 
+     * @return TCSMS_Core 插件核心实例
+     */
+    function tcsms() {
+        return TCSMS_Core::get_instance();
+    }
+}
+
+// 初始化插件函数
+if (!function_exists('tcsms_init')) {
+    /**
+     * 初始化插件
+     */
+    function tcsms_init() {
+        // 确保核心类已加载
+        if (!class_exists('TCSMS_Core')) {
+            $core_file = TCSMS_PLUGIN_DIR . 'includes/class-core.php';
+            if (file_exists($core_file)) {
+                require_once $core_file;
+            } else {
+                error_log('腾讯云短信插件：核心类文件不存在');
+                return;
+            }
+        }
         
-        if (file_exists($file_path)) {
-            require_once $file_path;
-        } else {
-            // 调试信息
-            error_log('腾讯云短信插件：未找到类文件: ' . $file_path);
+        // 加载文本域
+        load_plugin_textdomain('tencent-cloud-sms', false, dirname(plugin_basename(__FILE__)) . '/languages');
+        
+        // 获取插件实例并初始化
+        try {
+            $tcsms = tcsms();
+            $tcsms->init();
+        } catch (Exception $e) {
+            error_log('腾讯云短信插件初始化失败: ' . $e->getMessage());
+            
+            if (is_admin()) {
+                add_action('admin_notices', function() use ($e) {
+                    ?>
+                    <div class="notice notice-error">
+                        <p><strong>腾讯云短信插件错误：</strong> <?php echo esc_html($e->getMessage()); ?></p>
+                    </div>
+                    <?php
+                });
+            }
         }
     }
 }
 
-/**
- * 获取插件实例
- * 
- * @return TCSMS_Core 插件核心实例
- */
-function tcsms() {
-    return TCSMS_Core::get_instance();
+// 注册激活和停用钩子
+register_activation_hook(__FILE__, function() {
+    if (class_exists('TCSMS_Core')) {
+        TCSMS_Core::activate();
+    } else {
+        // 如果类不存在，稍后通过插件初始化来激活
+        add_action('plugins_loaded', function() {
+            TCSMS_Core::activate();
+        }, 20);
+    }
+});
+
+register_deactivation_hook(__FILE__, function() {
+    if (class_exists('TCSMS_Core')) {
+        TCSMS_Core::deactivate();
+    } else {
+        add_action('plugins_loaded', function() {
+            TCSMS_Core::deactivate();
+        }, 20);
+    }
+});
+
+// 短代码表单辅助函数
+if (!function_exists('tcsms_shortcode_form')) {
+    /**
+     * 短代码表单辅助函数
+     * 
+     * @param array $atts 短代码属性
+     * @return string HTML表单
+     */
+    function tcsms_shortcode_form($atts = []) {
+        $atts = shortcode_atts([
+            'title' => __('短信验证', 'tencent-cloud-sms'),
+            'phone_label' => __('手机号码', 'tencent-cloud-sms'),
+            'code_label' => __('验证码', 'tencent-cloud-sms'),
+            'button_text' => __('获取验证码', 'tencent-cloud-sms'),
+            'submit_text' => __('验证', 'tencent-cloud-sms'),
+            'class' => 'tcsms-form'
+        ], $atts, 'tcsms_form');
+        
+        ob_start();
+        ?>
+        <div class="tcsms-form-container <?php echo esc_attr($atts['class']); ?>">
+            <?php if (!empty($atts['title'])): ?>
+                <h3 class="tcsms-form-title"><?php echo esc_html($atts['title']); ?></h3>
+            <?php endif; ?>
+            
+            <div class="tcsms-form-group">
+                <label for="tcsms_phone_<?php echo uniqid(); ?>">
+                    <?php echo esc_html($atts['phone_label']); ?>
+                </label>
+                <input type="tel" 
+                       id="tcsms_phone_<?php echo uniqid(); ?>" 
+                       class="tcsms-phone-input" 
+                       pattern="1[3-9]\d{9}" 
+                       maxlength="11" 
+                       placeholder="<?php esc_attr_e('请输入手机号码', 'tencent-cloud-sms'); ?>" 
+                       required>
+            </div>
+            
+            <div class="tcsms-form-group">
+                <label for="tcsms_code_<?php echo uniqid(); ?>">
+                    <?php echo esc_html($atts['code_label']); ?>
+                </label>
+                <div class="tcsms-code-container">
+                    <input type="text" 
+                           id="tcsms_code_<?php echo uniqid(); ?>" 
+                           class="tcsms-code-input" 
+                           maxlength="6" 
+                           placeholder="<?php esc_attr_e('请输入验证码', 'tencent-cloud-sms'); ?>" 
+                           required>
+                    <button type="button" 
+                            class="tcsms-send-btn button">
+                        <?php echo esc_html($atts['button_text']); ?>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="tcsms-form-group">
+                <button type="button" 
+                        class="tcsms-verify-btn button button-primary">
+                    <?php echo esc_html($atts['submit_text']); ?>
+                </button>
+            </div>
+            
+            <div class="tcsms-message" style="display: none;"></div>
+        </div>
+        <?php
+        return ob_get_clean();
+    }
 }
 
 // 初始化插件
 add_action('plugins_loaded', 'tcsms_init', 10);
-
-/**
- * 初始化插件
- */
-function tcsms_init() {
-    // 确保核心类已加载
-    if (!class_exists('TCSMS_Core')) {
-        $core_file = TCSMS_PLUGIN_DIR . 'includes/class-core.php';
-        if (file_exists($core_file)) {
-            require_once $core_file;
-        } else {
-            error_log('腾讯云短信插件：核心类文件不存在');
-            return;
-        }
-    }
-    
-    // 加载文本域
-    load_plugin_textdomain('tencent-cloud-sms', false, dirname(plugin_basename(__FILE__)) . '/languages');
-    
-    // 获取插件实例并初始化
-    try {
-        $tcsms = tcsms();
-        $tcsms->init();
-    } catch (Exception $e) {
-        error_log('腾讯云短信插件初始化失败: ' . $e->getMessage());
-        
-        if (is_admin()) {
-            add_action('admin_notices', function() use ($e) {
-                ?>
-                <div class="notice notice-error">
-                    <p><strong>腾讯云短信插件错误：</strong> <?php echo esc_html($e->getMessage()); ?></p>
-                </div>
-                <?php
-            });
-        }
-    }
-}
-
-/**
- * 短代码表单辅助函数
- * 
- * @param array $atts 短代码属性
- * @return string HTML表单
- */
-function tcsms_shortcode_form($atts = []) {
-    $atts = shortcode_atts([
-        'title' => __('短信验证', 'tencent-cloud-sms'),
-        'phone_label' => __('手机号码', 'tencent-cloud-sms'),
-        'code_label' => __('验证码', 'tencent-cloud-sms'),
-        'button_text' => __('获取验证码', 'tencent-cloud-sms'),
-        'submit_text' => __('验证', 'tencent-cloud-sms'),
-        'class' => 'tcsms-form'
-    ], $atts, 'tcsms_form');
-    
-    ob_start();
-    ?>
-    <div class="tcsms-form-container <?php echo esc_attr($atts['class']); ?>">
-        <?php if (!empty($atts['title'])): ?>
-            <h3 class="tcsms-form-title"><?php echo esc_html($atts['title']); ?></h3>
-        <?php endif; ?>
-        
-        <div class="tcsms-form-group">
-            <label for="tcsms_phone_<?php echo uniqid(); ?>">
-                <?php echo esc_html($atts['phone_label']); ?>
-            </label>
-            <input type="tel" 
-                   id="tcsms_phone_<?php echo uniqid(); ?>" 
-                   class="tcsms-phone-input" 
-                   pattern="1[3-9]\d{9}" 
-                   maxlength="11" 
-                   placeholder="<?php esc_attr_e('请输入手机号码', 'tencent-cloud-sms'); ?>" 
-                   required>
-        </div>
-        
-        <div class="tcsms-form-group">
-            <label for="tcsms_code_<?php echo uniqid(); ?>">
-                <?php echo esc_html($atts['code_label']); ?>
-            </label>
-            <div class="tcsms-code-container">
-                <input type="text" 
-                       id="tcsms_code_<?php echo uniqid(); ?>" 
-                       class="tcsms-code-input" 
-                       maxlength="6" 
-                       placeholder="<?php esc_attr_e('请输入验证码', 'tencent-cloud-sms'); ?>" 
-                       required>
-                <button type="button" 
-                        class="tcsms-send-btn button">
-                    <?php echo esc_html($atts['button_text']); ?>
-                </button>
-            </div>
-        </div>
-        
-        <div class="tcsms-form-group">
-            <button type="button" 
-                    class="tcsms-verify-btn button button-primary">
-                <?php echo esc_html($atts['submit_text']); ?>
-            </button>
-        </div>
-        
-        <div class="tcsms-message" style="display: none;"></div>
-    </div>
-    <?php
-    return ob_get_clean();
-}
 
 // 注册短代码
 add_shortcode('tcsms_form', 'tcsms_shortcode_form');
