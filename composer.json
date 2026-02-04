@@ -1,0 +1,22 @@
+{
+    "name": "liuyuchen012/tencent-cloud-sms-2026",
+    "description": "Tencent Cloud SMS Plugin for WordPress",
+    "type": "wordpress-plugin",
+    "license": "gpl-3.0",
+    "require": {
+        "php": ">=7.4",
+        "tencentcloud/tencentcloud-sdk-php": "^3.0"
+    },
+    "autoload": {
+        "files": ["tencent-cloud-sms.php"]
+    },
+    "config": {
+        "optimize-autoloader": true
+    },
+    "authors": [
+        {
+            "name": "liuyuchen",
+            "email": "liuyuchen032901@outlook.com"
+        }
+    ]
+}

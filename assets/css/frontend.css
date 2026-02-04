@@ -1,0 +1,157 @@
+/* 主容器 */
+.tcsms-form-container {
+    max-width: 400px;
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 标题 */
+.tcsms-form-title {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: #333;
+    text-align: center;
+}
+
+/* 表单组 */
+.tcsms-form-group {
+    margin-bottom: 15px;
+}
+
+.tcsms-form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #555;
+}
+
+/* 输入框 */
+.tcsms-phone-input,
+.tcsms-code-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+.tcsms-phone-input:focus,
+.tcsms-code-input:focus {
+    border-color: #007cba;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 124, 186, 0.1);
+}
+
+/* 验证码容器 */
+.tcsms-code-container {
+    display: flex;
+    gap: 10px;
+}
+
+.tcsms-code-input {
+    flex: 1;
+}
+
+/* 按钮 */
+.tcsms-send-btn,
+.tcsms-verify-btn {
+    width: 100%;
+    padding: 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.tcsms-send-btn {
+    background: #6c757d;
+    color: white;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.tcsms-send-btn:hover {
+    background: #5a6268;
+}
+
+.tcsms-send-btn.disabled {
+    background: #ccc !important;
+    cursor: not-allowed;
+}
+
+.tcsms-verify-btn {
+    background: #007cba;
+    color: white;
+    font-weight: 500;
+}
+
+.tcsms-verify-btn:hover {
+    background: #005a87;
+}
+
+.tcsms-verify-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+/* 消息框 */
+.tcsms-message {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    text-align: center;
+}
+
+.tcsms-message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.tcsms-message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.tcsms-message.warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+/* 响应式设计 */
+@media (max-width: 480px) {
+    .tcsms-form-container {
+        padding: 15px;
+        margin: 10px;
+    }
+    
+    .tcsms-code-container {
+        flex-direction: column;
+    }
+    
+    .tcsms-send-btn {
+        width: 100%;
+    }
+}
+
+/* 登录页面样式 */
+#tcsms_login_code {
+    width: 120px;
+    margin-right: 10px;
+}
+
+#tcsms_login_send {
+    margin-top: 5px;
+    vertical-align: middle;
+}

@@ -1,0 +1,106 @@
+/* 设置页面容器 */
+.tcsms-settings .wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.tcsms-settings-container {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+/* 表单区域 */
+.tcsms-settings-container > form {
+    flex: 2;
+    min-width: 0;
+}
+
+/* 侧边栏 */
+.tcsms-settings-sidebar {
+    flex: 1;
+    min-width: 300px;
+}
+
+/* 设置盒子 */
+.tcsms-test-box,
+.tcsms-info-box {
+    background: #fff;
+    border: 1px solid #ccd0d4;
+    border-radius: 4px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.tcsms-test-box h3,
+.tcsms-info-box h3 {
+    margin-top: 0;
+    color: #23282d;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.tcsms-info-box h4 {
+    margin: 15px 0 10px;
+    color: #666;
+}
+
+/* 测试结果 */
+#tcsms_test_result {
+    padding: 10px;
+    border-radius: 3px;
+    font-size: 13px;
+}
+
+#tcsms_test_result.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+#tcsms_test_result.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* 代码块 */
+.tcsms-info-box code {
+    display: block;
+    padding: 10px;
+    background: #f6f7f7;
+    border: 1px solid #e5e5e5;
+    border-radius: 3px;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 13px;
+    margin: 10px 0;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+/* 列表 */
+.tcsms-info-box ol {
+    margin-left: 20px;
+    padding-left: 0;
+}
+
+.tcsms-info-box li {
+    margin-bottom: 8px;
+}
+
+/* 表格调整 */
+.tcsms-settings .form-table th {
+    width: 200px;
+}
+
+/* 响应式 */
+@media (max-width: 1024px) {
+    .tcsms-settings-container {
+        flex-direction: column;
+    }
+    
+    .tcsms-settings-sidebar {
+        min-width: 100%;
+    }
+}
