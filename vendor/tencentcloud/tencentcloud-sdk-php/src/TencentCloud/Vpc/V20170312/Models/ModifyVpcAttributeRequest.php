@@ -1,0 +1,137 @@
+<?php
+/*
+ * Copyright (c) 2017-2025 Tencent. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+namespace TencentCloud\Vpc\V20170312\Models;
+use TencentCloud\Common\AbstractModel;
+
+/**
+ * ModifyVpcAttribute请求参数结构体
+ *
+ * @method string getVpcId() 获取VPC实例ID。形如：vpc-f49l6u0z。
+ * @method void setVpcId(string $VpcId) 设置VPC实例ID。形如：vpc-f49l6u0z。
+ * @method string getVpcName() 获取私有网络名称，可任意命名，但不得超过60个字符。
+ * @method void setVpcName(string $VpcName) 设置私有网络名称，可任意命名，但不得超过60个字符。
+ * @method string getEnableMulticast() 获取是否开启组播。true: 开启, false: 关闭。
+ * @method void setEnableMulticast(string $EnableMulticast) 设置是否开启组播。true: 开启, false: 关闭。
+ * @method array getDnsServers() 获取DNS地址，最多支持4个，第1个默认为主，其余为备。
+ * @method void setDnsServers(array $DnsServers) 设置DNS地址，最多支持4个，第1个默认为主，其余为备。
+ * @method string getDomainName() 获取域名。
+ * @method void setDomainName(string $DomainName) 设置域名。
+ * @method boolean getEnableRouteVpcPublish() 获取vpc关联云联网时路由发布策略， true：开启cidr路由发布，false：开启subnet子网路由发布。创建vpc时默认为子网路由发布，当选择cidr路由发布时,请通过工单加入白名单
+ * @method void setEnableRouteVpcPublish(boolean $EnableRouteVpcPublish) 设置vpc关联云联网时路由发布策略， true：开启cidr路由发布，false：开启subnet子网路由发布。创建vpc时默认为子网路由发布，当选择cidr路由发布时,请通过工单加入白名单
+ * @method boolean getEnableCdcPublish() 获取发布cdc 子网到云联网的开关。true: 发布, false: 不发布。
+ * @method void setEnableCdcPublish(boolean $EnableCdcPublish) 设置发布cdc 子网到云联网的开关。true: 发布, false: 不发布。
+ * @method boolean getEnableRouteVpcPublishIpv6() 获取vpc关联云联网时IPv6类型路由发布策略， true：开启cidr路由发布，false：开启subnet子网路由发布。创建vpc时默认为子网路由发布，当选择cidr路由发布时，请通过工单加入白名单。
+ * @method void setEnableRouteVpcPublishIpv6(boolean $EnableRouteVpcPublishIpv6) 设置vpc关联云联网时IPv6类型路由发布策略， true：开启cidr路由发布，false：开启subnet子网路由发布。创建vpc时默认为子网路由发布，当选择cidr路由发布时，请通过工单加入白名单。
+ */
+class ModifyVpcAttributeRequest extends AbstractModel
+{
+    /**
+     * @var string VPC实例ID。形如：vpc-f49l6u0z。
+     */
+    public $VpcId;
+
+    /**
+     * @var string 私有网络名称，可任意命名，但不得超过60个字符。
+     */
+    public $VpcName;
+
+    /**
+     * @var string 是否开启组播。true: 开启, false: 关闭。
+     */
+    public $EnableMulticast;
+
+    /**
+     * @var array DNS地址，最多支持4个，第1个默认为主，其余为备。
+     */
+    public $DnsServers;
+
+    /**
+     * @var string 域名。
+     */
+    public $DomainName;
+
+    /**
+     * @var boolean vpc关联云联网时路由发布策略， true：开启cidr路由发布，false：开启subnet子网路由发布。创建vpc时默认为子网路由发布，当选择cidr路由发布时,请通过工单加入白名单
+     */
+    public $EnableRouteVpcPublish;
+
+    /**
+     * @var boolean 发布cdc 子网到云联网的开关。true: 发布, false: 不发布。
+     */
+    public $EnableCdcPublish;
+
+    /**
+     * @var boolean vpc关联云联网时IPv6类型路由发布策略， true：开启cidr路由发布，false：开启subnet子网路由发布。创建vpc时默认为子网路由发布，当选择cidr路由发布时，请通过工单加入白名单。
+     */
+    public $EnableRouteVpcPublishIpv6;
+
+    /**
+     * @param string $VpcId VPC实例ID。形如：vpc-f49l6u0z。
+     * @param string $VpcName 私有网络名称，可任意命名，但不得超过60个字符。
+     * @param string $EnableMulticast 是否开启组播。true: 开启, false: 关闭。
+     * @param array $DnsServers DNS地址，最多支持4个，第1个默认为主，其余为备。
+     * @param string $DomainName 域名。
+     * @param boolean $EnableRouteVpcPublish vpc关联云联网时路由发布策略， true：开启cidr路由发布，false：开启subnet子网路由发布。创建vpc时默认为子网路由发布，当选择cidr路由发布时,请通过工单加入白名单
+     * @param boolean $EnableCdcPublish 发布cdc 子网到云联网的开关。true: 发布, false: 不发布。
+     * @param boolean $EnableRouteVpcPublishIpv6 vpc关联云联网时IPv6类型路由发布策略， true：开启cidr路由发布，false：开启subnet子网路由发布。创建vpc时默认为子网路由发布，当选择cidr路由发布时，请通过工单加入白名单。
+     */
+    function __construct()
+    {
+
+    }
+
+    /**
+     * For internal only. DO NOT USE IT.
+     */
+    public function deserialize($param)
+    {
+        if ($param === null) {
+            return;
+        }
+        if (array_key_exists("VpcId",$param) and $param["VpcId"] !== null) {
+            $this->VpcId = $param["VpcId"];
+        }
+
+        if (array_key_exists("VpcName",$param) and $param["VpcName"] !== null) {
+            $this->VpcName = $param["VpcName"];
+        }
+
+        if (array_key_exists("EnableMulticast",$param) and $param["EnableMulticast"] !== null) {
+            $this->EnableMulticast = $param["EnableMulticast"];
+        }
+
+        if (array_key_exists("DnsServers",$param) and $param["DnsServers"] !== null) {
+            $this->DnsServers = $param["DnsServers"];
+        }
+
+        if (array_key_exists("DomainName",$param) and $param["DomainName"] !== null) {
+            $this->DomainName = $param["DomainName"];
+        }
+
+        if (array_key_exists("EnableRouteVpcPublish",$param) and $param["EnableRouteVpcPublish"] !== null) {
+            $this->EnableRouteVpcPublish = $param["EnableRouteVpcPublish"];
+        }
+
+        if (array_key_exists("EnableCdcPublish",$param) and $param["EnableCdcPublish"] !== null) {
+            $this->EnableCdcPublish = $param["EnableCdcPublish"];
+        }
+
+        if (array_key_exists("EnableRouteVpcPublishIpv6",$param) and $param["EnableRouteVpcPublishIpv6"] !== null) {
+            $this->EnableRouteVpcPublishIpv6 = $param["EnableRouteVpcPublishIpv6"];
+        }
+    }
+}
