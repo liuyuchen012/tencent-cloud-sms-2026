@@ -28,26 +28,49 @@ define('TCSMS_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('TCSMS_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('TCSMS_PLUGIN_BASENAME', plugin_basename(__FILE__));
 
-// 检查是否已加载Composer自动加载器
-$composer_autoload = TCSMS_PLUGIN_DIR . 'vendor/autoload.php';
-if (file_exists($composer_autoload)) {
-    require_once $composer_autoload;
-}
-
-// 自动加载插件类
-spl_autoload_register('tcsms_autoloader');
+// 检查Composer依赖是否已安装
+add_action('plugins_loaded', function() {
+    $composer_autoload = TCSMS_PLUGIN_DIR . 'vendor/autoload.php';
+    
+    if (!file_exists($composer_autoload)) {
+        // 显示错误提示但允许插件继续加载（测试模式可用）
+        if (is_admin()) {
+            add_action('admin_notices', function() {
+                ?>
+                <div class="notice notice-warning">
+                    <p><strong>腾讯云短信插件：</strong> 缺少Composer依赖包。如需完整功能，请在插件目录运行：<code>composer install</code></p>
+                </div>
+                <?php
+            });
+        }
+    } else {
+        // 加载Composer自动加载器
+        require_once $composer_autoload;
+    }
+    
+    // 自动加载插件类
+    spl_autoload_register('tcsms_autoloader');
+    
+    // 注册激活和停用钩子（必须在这里注册，确保类已加载）
+    register_activation_hook(__FILE__, ['TCSMS_Core', 'activate']);
+    register_deactivation_hook(__FILE__, ['TCSMS_Core', 'deactivate']);
+}, 5);
 
 /**
  * 类自动加载器
+ * 支持：TCSMS_Core, TCSMS_Settings, TCSMS_API, TCSMS_DB
  */
 function tcsms_autoloader($class_name) {
-    if (false !== strpos($class_name, 'TCSMS_')) {
-        $classes_dir = TCSMS_PLUGIN_DIR . 'includes' . DIRECTORY_SEPARATOR;
-        $class_file = 'class-' . str_replace('_', '-', strtolower($class_name)) . '.php';
-        $file_path = $classes_dir . $class_file;
+    // 只加载TCSMS_开头的类
+    if (strpos($class_name, 'TCSMS_') === 0) {
+        $class_file = str_replace('_', '-', strtolower(substr($class_name, 6)));
+        $file_path = TCSMS_PLUGIN_DIR . 'includes/class-' . $class_file . '.php';
         
         if (file_exists($file_path)) {
             require_once $file_path;
+        } else {
+            // 调试信息
+            error_log('腾讯云短信插件：未找到类文件: ' . $file_path);
         }
     }
 }
@@ -62,25 +85,45 @@ function tcsms() {
 }
 
 // 初始化插件
-add_action('plugins_loaded', 'tcsms_init');
+add_action('plugins_loaded', 'tcsms_init', 10);
 
 /**
  * 初始化插件
  */
 function tcsms_init() {
+    // 确保核心类已加载
+    if (!class_exists('TCSMS_Core')) {
+        $core_file = TCSMS_PLUGIN_DIR . 'includes/class-core.php';
+        if (file_exists($core_file)) {
+            require_once $core_file;
+        } else {
+            error_log('腾讯云短信插件：核心类文件不存在');
+            return;
+        }
+    }
+    
     // 加载文本域
     load_plugin_textdomain('tencent-cloud-sms', false, dirname(plugin_basename(__FILE__)) . '/languages');
     
-    // 获取插件实例
-    $tcsms = tcsms();
-    
-    // 初始化插件
-    $tcsms->init();
+    // 获取插件实例并初始化
+    try {
+        $tcsms = tcsms();
+        $tcsms->init();
+    } catch (Exception $e) {
+        error_log('腾讯云短信插件初始化失败: ' . $e->getMessage());
+        
+        if (is_admin()) {
+            add_action('admin_notices', function() use ($e) {
+                ?>
+                <div class="notice notice-error">
+                    <p><strong>腾讯云短信插件错误：</strong> <?php echo esc_html($e->getMessage()); ?></p>
+                </div>
+                <?php
+            });
+        }
+    }
 }
 
-// 注册激活和停用钩子
-register_activation_hook(__FILE__, ['TCSMS_Core', 'activate']);
-register_deactivation_hook(__FILE__, ['TCSMS_Core', 'deactivate']);
 /**
  * 短代码表单辅助函数
  * 

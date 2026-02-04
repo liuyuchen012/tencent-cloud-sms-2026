@@ -39,7 +39,7 @@ class TCSMS_API {
         }
         
         try {
-            // 检查SDK是否可用
+            // 检查腾讯云SDK是否可用
             if (class_exists('TencentCloud\\Common\\Credential')) {
                 $cred = new TencentCloud\Common\Credential($secret_id, $secret_key);
                 $httpProfile = new TencentCloud\Common\Profile\HttpProfile();
@@ -49,6 +49,9 @@ class TCSMS_API {
                 $clientProfile->setHttpProfile($httpProfile);
                 
                 $this->client = new TencentCloud\Sms\V20210111\SmsClient($cred, $region, $clientProfile);
+            } else {
+                // SDK未加载，使用测试模式
+                error_log('腾讯云短信：SDK未加载，启用测试模式');
             }
         } catch (Exception $e) {
             error_log('腾讯云SMS初始化失败: ' . $e->getMessage());
@@ -238,10 +241,16 @@ class TCSMS_API {
             wp_send_json_error(['message' => $result->get_error_message()]);
         }
         
-        wp_send_json_success([
+        $response_data = [
             'message' => $result['message'],
-            'code' => $code // 测试环境下返回验证码
-        ]);
+        ];
+        
+        // 测试环境下返回验证码（无SDK时）
+        if (!$this->client && isset($result['message']) && strpos($result['message'], '测试模式') !== false) {
+            $response_data['code'] = $code;
+        }
+        
+        wp_send_json_success($response_data);
     }
     
     /**
@@ -288,6 +297,7 @@ class TCSMS_API {
         
         return sanitize_text_field($ip);
     }
+    
     /**
      * AJAX清理过期数据
      */
@@ -317,4 +327,4 @@ class TCSMS_API {
             wp_send_json_error(['message' => __('清理失败', 'tencent-cloud-sms')]);
         }
     }
-    }
+}
