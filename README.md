@@ -1,4 +1,4 @@
-# 腾讯云短信验证码插件 - 超详细使用说明
+# 腾讯云短信验证码插件2026
 
 ## 📋 目录
 1. [系统要求](#系统要求)
@@ -832,5 +832,6 @@ COMPOSER_MEMORY_LIMIT=-1 composer install
 **作者**: LiuYuchen  / 刘宇晨
 **联系方式**: liuyuchen032901@outlook.com  
 **项目地址**: https://github.com/liuyuchen012/tencent-cloud-sms-2026
+
 
 感谢您使用腾讯云短信验证码插件！如果遇到任何问题或有改进建议，请随时联系我。
