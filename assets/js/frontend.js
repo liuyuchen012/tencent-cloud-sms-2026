@@ -13,7 +13,9 @@
             $(document).on('click', '.tcsms-verify-btn', this.verifyCode.bind(this));
             
             // 登录页面特定处理
-            $('#tcsms_login_send').on('click', this.sendLoginCode.bind(this));
+            if ($('#tcsms_login_send').length) {
+                $('#tcsms_login_send').on('click', this.sendLoginCode.bind(this));
+            }
         },
         
         // 发送验证码
@@ -27,7 +29,7 @@
             
             // 验证手机号
             if (!this.validatePhone(phone)) {
-                this.showMessage($container, tcsms_frontend.texts.invalid_phone, 'error');
+                this.showMessage($container, '请输入有效的手机号码', 'error');
                 return;
             }
             
@@ -37,20 +39,20 @@
             }
             
             // 发送请求
-            $button.addClass('disabled').text(tcsms_frontend.texts.sending);
+            $button.addClass('disabled').text('发送中...');
             
             $.ajax({
-                url: tcsms_frontend.ajax_url,
+                url: window.tcsms_frontend?.ajax_url || '/wp-admin/admin-ajax.php',
                 type: 'POST',
                 data: {
                     action: 'tcsms_send_verification',
                     phone: phone,
-                    nonce: tcsms_frontend.nonce
+                    nonce: window.tcsms_frontend?.nonce || ''
                 },
                 dataType: 'json',
                 success: function(response) {
                     if (response.success) {
-                        TCSMS.showMessage($container, response.data.message || tcsms_frontend.texts.success, 'success');
+                        TCSMS.showMessage($container, response.data.message || '发送成功', 'success');
                         TCSMS.startCountdown($button);
                         
                         // 测试环境下显示验证码
@@ -58,13 +60,26 @@
                             console.log('测试验证码：', response.data.code);
                         }
                     } else {
-                        TCSMS.showMessage($container, response.data.message || tcsms_frontend.texts.failed, 'error');
-                        $button.removeClass('disabled').text(tcsms_frontend.texts.resend);
+                        TCSMS.showMessage($container, response.data.message || '发送失败', 'error');
+                        $button.removeClass('disabled').text('获取验证码');
                     }
                 },
-                error: function() {
-                    TCSMS.showMessage($container, tcsms_frontend.texts.failed, 'error');
-                    $button.removeClass('disabled').text(tcsms_frontend.texts.resend);
+                error: function(xhr, status, error) {
+                    console.error('AJAX错误:', status, error);
+                    console.error('响应:', xhr.responseText);
+                    
+                    var errorMsg = '网络错误，请检查控制台查看详情';
+                    if (xhr.responseText) {
+                        try {
+                            var response = JSON.parse(xhr.responseText);
+                            errorMsg = response.data?.message || errorMsg;
+                        } catch(e) {
+                            errorMsg = xhr.responseText.substring(0, 100);
+                        }
+                    }
+                    
+                    TCSMS.showMessage($container, errorMsg, 'error');
+                    $button.removeClass('disabled').text('获取验证码');
                 }
             });
         },
@@ -76,7 +91,7 @@
             var phone = $phoneInput.val().trim();
             
             if (!this.validatePhone(phone)) {
-                alert(tcsms_frontend.texts.invalid_phone);
+                alert('请输入有效的手机号码');
                 return;
             }
             
@@ -84,28 +99,30 @@
                 return;
             }
             
-            $button.addClass('disabled').text(tcsms_frontend.texts.sending);
+            $button.addClass('disabled').text('发送中...');
             
             $.ajax({
-                url: tcsms_frontend.ajax_url,
+                url: window.tcsms_frontend?.ajax_url || '/wp-admin/admin-ajax.php',
                 type: 'POST',
                 data: {
                     action: 'tcsms_send_verification',
                     phone: phone,
-                    nonce: tcsms_frontend.nonce
+                    nonce: window.tcsms_frontend?.nonce || ''
                 },
                 dataType: 'json',
                 success: function(response) {
                     if (response.success) {
-                        alert(response.data.message || tcsms_frontend.texts.success);
+                        alert(response.data.message || '发送成功');
                         TCSMS.startCountdown($button);
                     } else {
-                        alert(response.data.message || tcsms_frontend.texts.failed);
+                        alert(response.data.message || '发送失败');
                         $button.removeClass('disabled').text('获取验证码');
                     }
                 },
-                error: function() {
-                    alert(tcsms_frontend.texts.failed);
+                error: function(xhr, status, error) {
+                    console.error('AJAX错误:', status, error);
+                    console.error('响应:', xhr.responseText);
+                    alert('网络错误，请检查控制台查看详情');
                     $button.removeClass('disabled').text('获取验证码');
                 }
             });
@@ -125,7 +142,7 @@
             
             // 验证输入
             if (!this.validatePhone(phone)) {
-                this.showMessage($container, tcsms_frontend.texts.invalid_phone, 'error');
+                this.showMessage($container, '请输入有效的手机号码', 'error');
                 return;
             }
             
@@ -139,13 +156,13 @@
             
             // 发送验证请求
             $.ajax({
-                url: tcsms_frontend.ajax_url,
+                url: window.tcsms_frontend?.ajax_url || '/wp-admin/admin-ajax.php',
                 type: 'POST',
                 data: {
                     action: 'tcsms_verify_code',
                     phone: phone,
                     code: code,
-                    nonce: tcsms_frontend.nonce
+                    nonce: window.tcsms_frontend?.nonce || ''
                 },
                 dataType: 'json',
                 success: function(response) {
@@ -162,13 +179,16 @@
                         setTimeout(function() {
                             $codeInput.val('');
                             TCSMS.showMessage($container, '', 'success', true);
+                            $button.prop('disabled', false).text('验证');
                         }, 3000);
                     } else {
                         TCSMS.showMessage($container, response.data.message || '验证失败', 'error');
                         $button.prop('disabled', false).text('验证');
                     }
                 },
-                error: function() {
+                error: function(xhr, status, error) {
+                    console.error('AJAX错误:', status, error);
+                    console.error('响应:', xhr.responseText);
                     TCSMS.showMessage($container, '验证失败，请重试', 'error');
                     $button.prop('disabled', false).text('验证');
                 }
@@ -203,7 +223,7 @@
             
             var updateButton = function() {
                 if (countdown > 0) {
-                    $button.text(countdown + tcsms_frontend.texts.countdown);
+                    $button.text(countdown + '秒后重试');
                     countdown--;
                 } else {
                     clearInterval(timer);

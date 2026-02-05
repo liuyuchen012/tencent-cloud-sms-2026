@@ -1,0 +1,101 @@
+/* 登录页面样式 */
+.tcsms-login-section {
+    margin-bottom: 20px;
+}
+
+.tcsms-login-method {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.tcsms-login-method label {
+    display: inline-block;
+    margin-right: 20px;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+}
+
+.tcsms-login-method input[type="radio"] {
+    margin-right: 5px;
+}
+
+#tcsms_sms_login {
+    margin-top: 15px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 4px;
+    border: 1px solid #e5e5e5;
+}
+
+#tcsms_sms_login label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #555;
+}
+
+#tcsms_login_phone {
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.tcsms-code-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.tcsms-code-group input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+#tcsms_login_send {
+    flex-shrink: 0;
+    padding: 8px 15px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#tcsms_login_send:hover {
+    background: #5a6268;
+}
+
+#tcsms_login_send.disabled {
+    background: #ccc !important;
+    cursor: not-allowed;
+}
+
+/* 响应式设计 */
+@media (max-width: 480px) {
+    .tcsms-login-method {
+        text-align: center;
+    }
+    
+    .tcsms-login-method label {
+        display: block;
+        margin: 10px 0;
+    }
+    
+    .tcsms-code-group {
+        flex-direction: column;
+    }
+    
+    #tcsms_login_send {
+        width: 100%;
+    }
+}

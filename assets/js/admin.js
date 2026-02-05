@@ -1,3 +1,4 @@
+// [file name]: admin.js (替换原文件内容)
 (function($) {
     'use strict';
     
@@ -18,16 +19,18 @@
         }
         
         // 禁用按钮
-        $button.prop('disabled', true).text(tcsms_admin.texts.test_sending);
+        $button.prop('disabled', true).text('发送中...');
         
-        // 发送测试请求
+        // 发送测试请求 - 使用 admin-settings.php 中定义的 nonce
+        var nonce = tcsms_admin?.nonce || $('#tcsms_admin_nonce').val() || '';
+        
         $.ajax({
-            url: tcsms_admin.ajax_url,
+            url: ajaxurl, // 使用WordPress提供的ajaxurl
             type: 'POST',
             data: {
                 action: 'tcsms_send_verification',
                 phone: phone,
-                nonce: tcsms_admin.nonce
+                nonce: nonce
             },
             dataType: 'json',
             success: function(response) {
@@ -35,22 +38,24 @@
                     $result
                         .removeClass('error')
                         .addClass('success')
-                        .text(tcsms_admin.texts.test_success + (response.data.code ? ' (测试码: ' + response.data.code + ')' : ''))
+                        .text('发送成功！' + (response.data.code ? ' 测试验证码：' + response.data.code : ''))
                         .show();
                 } else {
                     $result
                         .removeClass('success')
                         .addClass('error')
-                        .text(response.data.message || '发送失败')
+                        .text('发送失败：' + (response.data.message || '未知错误'))
                         .show();
                 }
                 $button.prop('disabled', false).text('发送测试短信');
             },
-            error: function() {
+            error: function(xhr, status, error) {
+                console.error('AJAX错误:', status, error);
+                console.error('响应:', xhr.responseText);
                 $result
                     .removeClass('success')
                     .addClass('error')
-                    .text('网络错误，请重试')
+                    .text('网络错误：' + error + '，请检查控制台查看详情')
                     .show();
                 $button.prop('disabled', false).text('发送测试短信');
             }

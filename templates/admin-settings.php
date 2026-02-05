@@ -4,7 +4,29 @@
  * 
  * @package TencentCloudSMS
  */
-
+// 在admin-settings.php的开头添加
+add_action('admin_enqueue_scripts', function() {
+    if (isset($_GET['page']) && $_GET['page'] === 'tencent-cloud-sms') {
+        wp_enqueue_script(
+            'tcsms-admin',
+            TCSMS_PLUGIN_URL . 'assets/js/admin.js',
+            ['jquery'],
+            TCSMS_VERSION,
+            true
+        );
+        
+        // 传递nonce到admin.js
+        wp_localize_script('tcsms-admin', 'tcsms_admin', [
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('tcsms_ajax_nonce'), // 使用相同的nonce名称
+            'texts' => [
+                'test_sending' => __('测试发送中...', 'tencent-cloud-sms'),
+                'test_success' => __('测试短信发送成功', 'tencent-cloud-sms'),
+                'test_failed' => __('测试发送失败', 'tencent-cloud-sms')
+            ]
+        ]);
+    }
+});
 // 防止直接访问
 if (!defined('ABSPATH')) {
     exit;
